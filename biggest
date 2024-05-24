@@ -82,7 +82,6 @@ fi
 
 du_cmd=(
 	du
-	--apparent-size
 	--all
 	--max-depth
 	"${max_depth}"

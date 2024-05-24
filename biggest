@@ -1,0 +1,114 @@
+#!/usr/bin/env bash
+
+app_name='biggest'
+app_version='0.1'
+
+exclude=()
+
+OPTIND=1
+while getopts ':hvsld:n:x:' OPTION; do
+	case "$OPTION" in
+	h)
+		cat <<EOF
+${app_name} [options] [path...]
+
+List biggest files and folders.
+
+options:
+  -h                show help and exi
+  -v                show version and exitt
+  -s                device usage rather than apparent size
+  -l                follow symbolic links
+  -d NUM            max depth of directories to traverse
+  -n NUM            max number of output lines
+  -x PATTERN        exclude files by wildcard pattern
+
+Copyright © 2024 Tuncay D. <https://github.com/thingsiplay/${app_name}>
+EOF
+		exit 0
+		;;
+	v)
+		echo "${app_name} v${app_version}"
+		exit 0
+		;;
+	s)
+		disk_size=true
+		;;
+	l)
+		follow_links=true
+		;;
+	d)
+		if ! [[ ${OPTARG} =~ ^[0-9]+$ ]]; then
+			echo "Only digits allowed for -d: '${OPTARG}'" >&2
+			exit 1
+		fi
+		max_depth="${OPTARG}"
+		;;
+	n)
+		if ! [[ ${OPTARG} =~ ^[0-9]+$ ]]; then
+			echo "Only digits allowed for -l: '${OPTARG}'" >&2
+			exit 1
+		fi
+		max_lines="${OPTARG}"
+		;;
+	x)
+		exclude+=("${OPTARG}")
+		;;
+	?)
+		echo "Error parsing options: '${OPTARG}'" >&2
+		exit 1
+		;;
+	esac
+done
+shift "$((OPTIND - 1))"
+
+files=("${@}")
+
+if [ "${#files[@]}" -eq 0 ]; then
+	mapfile -t files < <(find ./* -maxdepth 0)
+fi
+
+if [ -z "${max_depth}" ]; then
+	max_depth=0
+fi
+
+if [ -z "${max_lines}" ]; then
+	max_lines="${#files[@]}"
+fi
+
+du_cmd=(
+	du
+	--apparent-size
+	--all
+	--max-depth
+	"${max_depth}"
+	--one-file-system
+	--human-readable
+)
+
+if [ -z "${disk_size}" ] || [ "${disk_size}" == false ]; then
+	du_cmd+=(--apparent-size)
+fi
+
+if [ -n "${follow_links}" ] && [ "${follow_links}" == true ]; then
+	du_cmd+=(--dereference)
+fi
+
+for x in "${exclude[@]}"; do
+	du_cmd+=(--exclude "${x}")
+done
+
+sort_cmd=(
+	sort
+	--human-numeric-sort
+	--ignore-leading-blanks
+	--reverse
+)
+
+head_cmd=(
+	head
+	--lines
+	"${max_lines}"
+)
+
+"${du_cmd[@]}" -- "${files[@]}" | "${sort_cmd[@]}" | "${head_cmd[@]}"

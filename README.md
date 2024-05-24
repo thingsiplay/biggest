@@ -59,11 +59,17 @@ Specify to calculate and report only specified files:
 biggest *.png
 ```
 
+Show a horizontal bar instead numbers for file size:
+
+```bash
+biggest -b *
+```
+
 Directories and files can be excluded using wildcards with option `-x` as well
 (but put them in quotes):
 
 ```bash
-biggest -x Gaming -x '*.png' *
+biggest -x Gaming -x '.steam*' *
 ```
 
 Search deeper into directories with option `-d`, instead just looking on their

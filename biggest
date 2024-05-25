@@ -6,7 +6,7 @@ app_version='0.3'
 exclude=()
 
 OPTIND=1
-while getopts ':hvutblLd:n:s:x:' OPTION; do
+while getopts ':hvutblLd:n:s:x:zZ' OPTION; do
 	case "$OPTION" in
 	h)
 		cat <<EOF
@@ -26,6 +26,8 @@ options:
   -n NUM            max number of output lines
   -s SIZE           exclude files by min size threshold, negative for max
   -x PATTERN        exclude files by wildcard pattern
+  -z                ignore reading paths from stdin
+  -Z                ignore list of paths from commandline
 
 Copyright © 2024 Tuncay D. <https://github.com/thingsiplay/${app_name}>
 EOF
@@ -75,6 +77,12 @@ EOF
 	x)
 		exclude+=("${OPTARG}")
 		;;
+	z)
+		ignore_stdin=true
+		;;
+	Z)
+		ignore_cmdline_paths=true
+		;;
 	?)
 		echo "Error parsing options: '${OPTARG}'" >&2
 		exit 1
@@ -83,7 +91,19 @@ EOF
 done
 shift "$((OPTIND - 1))"
 
-files=("${@}")
+files=()
+
+if [ -z "${ignore_cmdline_paths}" ] || [ "${ignore_cmdline_paths}" == false ]; then
+	files+=("${@}")
+fi
+
+if [ -z "${ignore_stdin}" ] || [ "${ignore_stdin}" == false ]; then
+	if ! [ -t 0 ]; then
+		while read -r -t 5 line; do
+			files+=("${line}")
+		done
+	fi
+fi
 
 if [ "${#files[@]}" -eq 0 ]; then
 	mapfile -t files < <(find ./* -maxdepth 0)

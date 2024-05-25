@@ -6,7 +6,7 @@ app_version='0.3'
 exclude=()
 
 OPTIND=1
-while getopts ':hvutblLd:n:x:' OPTION; do
+while getopts ':hvutblLd:n:s:x:' OPTION; do
 	case "$OPTION" in
 	h)
 		cat <<EOF
@@ -24,6 +24,7 @@ options:
   -L                follow all symbolic links
   -d NUM            max depth of directories to traverse
   -n NUM            max number of output lines
+  -s SIZE           exclude files by min size threshold, negative for max
   -x PATTERN        exclude files by wildcard pattern
 
 Copyright © 2024 Tuncay D. <https://github.com/thingsiplay/${app_name}>
@@ -62,6 +63,14 @@ EOF
 			exit 1
 		fi
 		max_lines="${OPTARG}"
+		;;
+	s)
+		size="${OPTARG^^}"
+		if ! [[ ${size} =~ ^[-+]?[0-9]+([KMGTPEZYRQ][B]?)?$ ]]; then
+			echo "Unrecognized size value for -s: '${OPTARG}'" >&2
+			exit 1
+		fi
+		threshold_size="${size}"
 		;;
 	x)
 		exclude+=("${OPTARG}")
@@ -109,6 +118,10 @@ if [ -n "${follow_args_links}" ] && [ "${follow_args_links}" == true ]; then
 	du_cmd+=(--dereference-args)
 elif [ -n "${follow_all_links}" ] && [ "${follow_all_links}" == true ]; then
 	du_cmd+=(--dereference)
+fi
+
+if [ -n "${threshold_size}" ] && ! [ "${threshold_size}" == "" ]; then
+	du_cmd+=(--threshold "${threshold_size}")
 fi
 
 for x in "${exclude[@]}"; do

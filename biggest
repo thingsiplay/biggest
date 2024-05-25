@@ -6,7 +6,7 @@ app_version='0.3'
 exclude=()
 
 OPTIND=1
-while getopts ':hvubld:n:x:' OPTION; do
+while getopts ':hvublLd:n:x:' OPTION; do
 	case "$OPTION" in
 	h)
 		cat <<EOF
@@ -19,7 +19,8 @@ options:
   -v                show version and exit
   -u                size of disk usage rather than apparent size
   -b                display horizontal bar instead number
-  -l                follow symbolic links
+  -l                follow symbolic links from commandline arguments only
+  -L                follow all symbolic links
   -d NUM            max depth of directories to traverse
   -n NUM            max number of output lines
   -x PATTERN        exclude files by wildcard pattern
@@ -39,7 +40,10 @@ EOF
 		horizontal_bar=true
 		;;
 	l)
-		follow_links=true
+		follow_args_links=true
+		;;
+	L)
+		follow_all_links=true
 		;;
 	d)
 		if ! [[ ${OPTARG} =~ ^[0-9]+$ ]]; then
@@ -92,7 +96,9 @@ if [ -z "${disk_usage}" ] || [ "${disk_usage}" == false ]; then
 	du_cmd+=(--apparent-size)
 fi
 
-if [ -n "${follow_links}" ] && [ "${follow_links}" == true ]; then
+if [ -n "${follow_args_links}" ] && [ "${follow_args_links}" == true ]; then
+	du_cmd+=(--dereference-args)
+elif [ -n "${follow_all_links}" ] && [ "${follow_all_links}" == true ]; then
 	du_cmd+=(--dereference)
 fi
 

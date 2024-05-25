@@ -16,7 +16,7 @@ List biggest files and folders.
 
 options:
   -h                show help and exi
-  -v                show version and exitt
+  -v                show version and exit
   -u                size of disk usage rather than apparent size
   -b                display horizontal bar instead number
   -l                follow symbolic links

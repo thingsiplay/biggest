@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 app_name='biggest'
-app_version='0.2'
+app_version='0.3'
 
 exclude=()
 

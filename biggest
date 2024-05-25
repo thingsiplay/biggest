@@ -6,7 +6,7 @@ app_version='0.2'
 exclude=()
 
 OPTIND=1
-while getopts ':hvsbld:n:x:' OPTION; do
+while getopts ':hvubld:n:x:' OPTION; do
 	case "$OPTION" in
 	h)
 		cat <<EOF
@@ -17,7 +17,7 @@ List biggest files and folders.
 options:
   -h                show help and exi
   -v                show version and exitt
-  -s                device usage rather than apparent size
+  -u                size of disk usage rather than apparent size
   -b                display horizontal bar instead number
   -l                follow symbolic links
   -d NUM            max depth of directories to traverse
@@ -32,8 +32,8 @@ EOF
 		echo "${app_name} v${app_version}"
 		exit 0
 		;;
-	s)
-		disk_size=true
+	u)
+		disk_usage=true
 		;;
 	b)
 		horizontal_bar=true
@@ -88,7 +88,7 @@ du_cmd=(
 	--one-file-system
 )
 
-if [ -z "${disk_size}" ] || [ "${disk_size}" == false ]; then
+if [ -z "${disk_usage}" ] || [ "${disk_usage}" == false ]; then
 	du_cmd+=(--apparent-size)
 fi
 
@@ -120,10 +120,10 @@ else
 	output=$("${du_cmd[@]}" -- "${files[@]}" | "${sort_cmd[@]}" | "${head_cmd[@]}")
 
 	# \u2592, \u2584, \u2596
-	bar_type="$(printf '\u2592')"
+	barcode="$(printf '\u2592')"
 	sizes="$(printf '%s' "${output}" | awk -F '\t' '{print $1}')"
 	paths="$(printf '%s' "${output}" | awk -F '\t' '{print $2}')"
-	sizes_f="$(printf '%s\n' "${sizes}" | sed "s/[0-9]/${bar_type}/g")"
+	sizes_f="$(printf '%s\n' "${sizes}" | sed "s/[0-9]/${barcode}/g")"
 
 	paste \
 		<(printf '%s' "${sizes_f}") \

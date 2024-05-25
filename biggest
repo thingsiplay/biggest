@@ -19,7 +19,7 @@ options:
   -v                show version and exit
   -u                size of disk usage rather than apparent size
   -b                display horizontal bar instead number
-  -t                count and add total size
+  -t                with total size for all commandline arguments
   -l                follow symbolic links from commandline arguments only
   -L                follow all symbolic links
   -d NUM            max depth of directories to traverse

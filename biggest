@@ -128,5 +128,5 @@ else
 	paste \
 		<(printf '%s' "${sizes_f}") \
 		<(printf '%s' "${paths}") \
-		--delimiters '\t' | sed 's/\t/\t/' | column -s $'\t' -t
+		--delimiters '\t' | column -s $'\t' -t
 fi

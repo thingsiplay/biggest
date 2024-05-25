@@ -79,4 +79,19 @@ surface. And output a specific amount of paths with option `-n`:
 biggest -d 2 -n 5 kiwix/*
 ```
 
+List only files with minimum size in bytes using option `-s` . Optionally add
+an unit to the number: `K`, `M`, `G`, `T`, `P`, `E`, `Z`, `Y`, `R`, `Q` to
+automatically calculate size with powers of 1024.
+
+```bash
+biggest -s 10k
+```
+
+Reverse size: Negative number with a minus sign in option `-s` will only output
+files that do not exceed maximum size:
+
+```bash
+biggest -s -1g
+```
+
 Have a great rest of your day.

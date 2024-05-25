@@ -39,7 +39,7 @@ chmod +x biggest
 Just run the script with or without files and folders to calculate.
 
 ```bash
-biggest [options] [path...]
+paths | biggest [options] [path...]
 ```
 
 By default the apparent size option of `du` is used, which will report entire
@@ -53,10 +53,17 @@ working directory:
 biggest
 ```
 
-Specify to calculate and report only specified files:
+Give a list of files as arguments to report:
 
 ```bash
 biggest *.png
+```
+
+If pipe is connected, then it will attempt to read newline separated list of
+paths from stdin:
+
+```bash
+find ~/.* -maxdepth 0 -type f | biggest
 ```
 
 Show a horizontal bar instead numbers for file size:

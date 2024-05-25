@@ -113,8 +113,6 @@ head_cmd=(
 	"${max_lines}"
 )
 
-output=$("${du_cmd[@]}" -- "${files[@]}" | "${sort_cmd[@]}" | "${head_cmd[@]}")
-
 if [ -z "${horizontal_bar}" ] || [ "${horizontal_bar}" == false ]; then
 	du_cmd+=(--human-readable)
 	"${du_cmd[@]}" -- "${files[@]}" | "${sort_cmd[@]}" | "${head_cmd[@]}"

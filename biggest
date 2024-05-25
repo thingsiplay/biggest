@@ -6,7 +6,7 @@ app_version='0.3'
 exclude=()
 
 OPTIND=1
-while getopts ':hvublLd:n:x:' OPTION; do
+while getopts ':hvutblLd:n:x:' OPTION; do
 	case "$OPTION" in
 	h)
 		cat <<EOF
@@ -19,6 +19,7 @@ options:
   -v                show version and exit
   -u                size of disk usage rather than apparent size
   -b                display horizontal bar instead number
+  -t                count and add total size
   -l                follow symbolic links from commandline arguments only
   -L                follow all symbolic links
   -d NUM            max depth of directories to traverse
@@ -35,6 +36,9 @@ EOF
 		;;
 	u)
 		disk_usage=true
+		;;
+	t)
+		total_size=true
 		;;
 	b)
 		horizontal_bar=true
@@ -80,10 +84,6 @@ if [ -z "${max_depth}" ]; then
 	max_depth=0
 fi
 
-if [ -z "${max_lines}" ]; then
-	max_lines="${#files[@]}"
-fi
-
 du_cmd=(
 	du
 	--all
@@ -91,6 +91,15 @@ du_cmd=(
 	"${max_depth}"
 	--one-file-system
 )
+
+if [ -z "${max_lines}" ]; then
+	max_lines="${#files[@]}"
+fi
+
+if [ -n "${total_size}" ] || [ "${total_size}" == true ]; then
+	du_cmd+=(--total)
+	max_lines=$((max_lines + 1))
+fi
 
 if [ -z "${disk_usage}" ] || [ "${disk_usage}" == false ]; then
 	du_cmd+=(--apparent-size)

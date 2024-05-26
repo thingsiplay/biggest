@@ -66,11 +66,18 @@ paths from stdin:
 find ~/.* -maxdepth 0 -type f | biggest
 ```
 
-Show a horizontal bar instead file size numbers with option `-b`. Combine it
-with `-r` to show file size in relative percentage.
+Show a horizontal bar instead file size numbers with option `-b`.
 
 ```bash
-biggest -rb *
+biggest -b *
+```
+
+Combine it with `-r` to add relative percentage compared to biggest file in
+list. Add a total size for all input with `-t`, in which case relative
+percentage is compared against it:
+
+```bash
+biggest -brt *
 ```
 
 Directories and files can be excluded using wildcards with option `-x` as well

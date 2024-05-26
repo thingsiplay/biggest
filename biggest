@@ -6,7 +6,7 @@ app_version='0.4'
 exclude=()
 
 OPTIND=1
-while getopts ':hvutpblLd:n:s:x:zZ' OPTION; do
+while getopts ':hvutpbrlLd:n:s:x:zZ' OPTION; do
 	case "$OPTION" in
 	h)
 		cat <<EOF
@@ -15,18 +15,19 @@ ${app_name} [options] [path...]
 List biggest files and folders.
 
 options:
-  -h                show help and exi
+  -h                show help and exit
   -v                show version and exit
   -u                size of disk usage rather than apparent size
   -p                hide size column and output file path only
-  -b                display horizontal bar instead number
+  -b                replace file size number with a horizontal bar
+  -r                replace file size number with a relative percentage
   -t                with total size for all commandline arguments
   -l                follow symbolic links from commandline arguments only
   -L                follow all symbolic links
   -d NUM            max depth of directories to traverse
   -n NUM            max number of output lines
   -s SIZE           exclude files by min size threshold, negative for max
-  -x PATTERN        exclude files by wildcard pattern
+  -x GLOB           exclude files by wildcard pattern
   -z                ignore reading paths from stdin
   -Z                ignore list of paths from commandline
 
@@ -49,6 +50,9 @@ EOF
 		;;
 	b)
 		horizontal_bar=true
+		;;
+	r)
+		relative_perc=true
 		;;
 	l)
 		follow_args_links=true
@@ -173,7 +177,7 @@ awk_cmd=(
 if [ -n "${path_only}" ] || [ "${path_only}" == true ]; then
 	"${du_cmd[@]}" -- "${files[@]}" | "${sort_cmd[@]}" | "${head_cmd[@]}" | "${awk_cmd[@]}"
 else
-	if [ -z "${horizontal_bar}" ] || [ "${horizontal_bar}" == false ]; then
+	if [ -z "${horizontal_bar}" ] || [ "${horizontal_bar}" == false ] && [ -z "${relative_perc}" ] || [ "${relative_perc}" == false ]; then
 		du_cmd+=(--human-readable)
 		"${du_cmd[@]}" -- "${files[@]}" | "${sort_cmd[@]}" | "${head_cmd[@]}"
 	else
@@ -185,9 +189,30 @@ else
 		paths="$(printf '%s' "${output}" | awk -F '\t' '{print $2}')"
 		sizes_f="$(printf '%s\n' "${sizes}" | sed "s/[0-9]/${barcode}/g")"
 
+		if [ -n "${relative_perc}" ] && [ "${relative_perc}" == true ]; then
+			biggest="$(printf '%s' "${sizes}" | head -n1)"
+			sizes_r=""
+			for s in ${sizes}; do
+				r=$((s * 100 / biggest))
+				sizes_r="$(echo -ne "${sizes_r}\n${r}%")"
+			done
+			sizes_r="$(printf '%s' "${sizes_r}" | sed -E '/^[[:space:]]*$/d')"
+			if [ -n "${horizontal_bar}" ] && [ "${horizontal_bar}" == true ]; then
+				sizes_f="$(
+					paste \
+						<(printf '%s' "${sizes_f}") \
+						<(printf '%s' "${sizes_r}") \
+						--delimiters '\t' | column -s $'\t' -t
+				)"
+			else
+				sizes_f="${sizes_r}"
+			fi
+		fi
+
 		paste \
 			<(printf '%s' "${sizes_f}") \
 			<(printf '%s' "${paths}") \
 			--delimiters '\t' | column -s $'\t' -t
+
 	fi
 fi

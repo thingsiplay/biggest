@@ -6,6 +6,8 @@ List biggest files and folders.
 - Source: [Github](https://github.com/thingsiplay/biggest)
 - License: [MIT](LICENSE)
 
+![screenshot](screenshot.png)
+
 ## What is this?
 
 A simple wrapper to Linux `du` command, combining with a few other commands to

@@ -19,8 +19,8 @@ options:
   -v                show version and exit
   -u                size of disk usage rather than apparent size
   -p                hide size column and output file path only
-  -b                replace file size number with a horizontal bar
-  -r                replace file size number with a relative percentage
+  -b                horizontal bar instead file size number
+  -r                relative percentage instead file size number
   -t                with total size for all commandline arguments
   -l                follow symbolic links from commandline arguments only
   -L                follow all symbolic links

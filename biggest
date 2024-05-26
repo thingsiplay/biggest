@@ -171,10 +171,11 @@ head_cmd=(
 
 awk_cmd=(
 	awk
+	-F'\t'
 	'{print $2}'
 )
 
-if [ -n "${path_only}" ] || [ "${path_only}" == true ]; then
+if [ -n "${path_only}" ] && [ "${path_only}" == true ]; then
 	"${du_cmd[@]}" -- "${files[@]}" | "${sort_cmd[@]}" | "${head_cmd[@]}" | "${awk_cmd[@]}"
 else
 	if [ -z "${horizontal_bar}" ] || [ "${horizontal_bar}" == false ] && [ -z "${relative_perc}" ] || [ "${relative_perc}" == false ]; then

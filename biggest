@@ -107,7 +107,7 @@ fi
 
 if [ -z "${ignore_stdin}" ] || [ "${ignore_stdin}" == false ]; then
 	if ! [ -t 0 ]; then
-		while read -r -t 5 line; do
+		while IFS= read -r -t 5 line; do
 			files+=("${line}")
 		done
 	fi

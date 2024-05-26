@@ -39,7 +39,7 @@ chmod +x biggest
 Just run the script with or without files and folders to calculate.
 
 ```bash
-paths | biggest [options] [path...]
+[paths] | biggest [options] [path...]
 ```
 
 By default the apparent size option of `du` is used, which will report entire
@@ -66,10 +66,11 @@ paths from stdin:
 find ~/.* -maxdepth 0 -type f | biggest
 ```
 
-Show a horizontal bar instead numbers for file size:
+Show a horizontal bar instead file size numbers with option `-b`. Combine it
+with `-r` to show file size in relative percentage.
 
 ```bash
-biggest -b *
+biggest -rb *
 ```
 
 Directories and files can be excluded using wildcards with option `-x` as well
